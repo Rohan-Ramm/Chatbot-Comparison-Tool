@@ -5,12 +5,18 @@ This is a tool for comparing various Large Language Models. Simply ask a questio
 - Model 2
 - Model 3
 ## Dependencies
-
-pip install python-dotenv
-pip install google-genai
-python -m pip install requests
-pip install Flask
-pip install Flask-SQLAlchemy
-pip install flask-cors
+### Frontend
+1. npm install
+### Backend
+1. pip install python-dotenv
+2. pip install google-genai
+3. python -m pip install requests
+4. pip install Flask
+5. pip install Flask-SQLAlchemy
+6. pip install flask-cors
 
 ## Required API keys
+
+## How to Run
+1. Frontend: npm run build -> npm run dev
+2. Backend: py main.py
