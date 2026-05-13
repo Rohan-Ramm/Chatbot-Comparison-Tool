@@ -7,8 +7,8 @@ function App() {
   const [glbLowScr,setGlbLowScr] = useState(0)
   const [glbHighScr,setGlbHighScr] = useState(0)
   const [scoresChangeable,setScoresChangeable] = useState(false)
-  const [lowResponse,setLowResponse] = useState("I lost a game, and while there's no shame in losing, especially since I had a strong opponent, there is shame in playing badly, and that's what I did. ")
-  const [highResponse,setHighResponse] = useState("I lost a game, and while there's no shame in losing, especially since I had a strong opponent, there is shame in playing badly, and that's what I did. ")
+  const [lowResponse,setLowResponse] = useState("... ")
+  const [highResponse,setHighResponse] = useState("...")
   const [usrQuestion,setUsrQuestion] = useState("")
 
   const askQuestion = async (e) => {
