@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { MODELS } from './App'
 
-function QuestionPanel({ onResponsesLoaded }) {
+function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onResponsesLoaded }) {
   const [usrQuestion, setUsrQuestion] = useState("")
-  const [lowResponse, setLowResponse] = useState("... ")
-  const [highResponse, setHighResponse] = useState("...")
+  const [response1, setResponse1] = useState("...")
+  const [response2, setResponse2] = useState("...")
 
   const askQuestion = async (e) => {
     e.preventDefault()
@@ -16,14 +17,14 @@ function QuestionPanel({ onResponsesLoaded }) {
     const options = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usrQuestion })
+      body: JSON.stringify({ usrQuestion, model1, model2 })
     }
     const response = await fetch(url, options)
     const message = await response.json()
     console.log(message)
     if (response.status == 201) {
-      setHighResponse(message["complex_response"])
-      setLowResponse(message["simple_response"])
+      setResponse1(message["simple_response"])
+      setResponse2(message["complex_response"])
     } else {
       console.log(message["message"])
     }
@@ -40,10 +41,24 @@ function QuestionPanel({ onResponsesLoaded }) {
           />
         </form>
       </div>
+      <div className="model-selectors">
+        <label>
+          Model 1:
+          <select value={model1} onChange={(e) => onModel1Change(e.target.value)}>
+            {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+        </label>
+        <label>
+          Model 2:
+          <select value={model2} onChange={(e) => onModel2Change(e.target.value)}>
+            {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+        </label>
+      </div>
       <div>
         <p>You said: {usrQuestion}</p>
-        <p>Low Complexity Model Response: {lowResponse}</p>
-        <p>High Complexity Model Response: {highResponse}</p>
+        <p>{model1} Response: {response1}</p>
+        <p>{model2} Response: {response2}</p>
       </div>
     </>
   )

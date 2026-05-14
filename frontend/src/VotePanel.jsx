@@ -1,14 +1,14 @@
-function VotePanel({ scoresChangeable, onSimpleVote, onComplexVote }) {
+function VotePanel({ scoresChangeable, model1, model2, onModel1Vote, onModel2Vote }) {
   if (!scoresChangeable) return null
 
   return (
     <div className="after-response">
       <h4>Which gave better advice?</h4>
       <p className="bullet-point">
-        Low Complexity <button className="tiny-button" id="low" onClick={onSimpleVote}><i className="fa fa-battery-empty"></i></button>
+        {model1} <button className="tiny-button" id="model1" onClick={onModel1Vote}><i className="fa fa-battery-empty"></i></button>
       </p>
       <p className="bullet-point">
-        High Complexity <button className="tiny-button" id="high" onClick={onComplexVote}><i className="fa fa-battery-three-quarters"></i></button>
+        {model2} <button className="tiny-button" id="model2" onClick={onModel2Vote}><i className="fa fa-battery-three-quarters"></i></button>
       </p>
     </div>
   )
