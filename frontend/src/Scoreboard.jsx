@@ -1,4 +1,6 @@
-function Scoreboard({ usrLowScr, usrHighScr, glbLowScr, glbHighScr, onClear }) {
+import { MODELS } from './App'
+
+function Scoreboard({ usrScores, glbScores, onClear }) {
   return (
     <div id="scores">
       <div className='border'>
@@ -7,13 +9,15 @@ function Scoreboard({ usrLowScr, usrHighScr, glbLowScr, glbHighScr, onClear }) {
             <h4> User Scores <i className="fa fa-user" aria-hidden="true"></i></h4>
             <button id="clear" onClick={onClear}>Clear</button>
           </div>
-          <p>Low Complexity: {usrLowScr}</p>
-          <p>High Complexity: {usrHighScr}</p>
+          {MODELS.map(model => (
+            <p key={model}>{model}: {usrScores[model]}</p>
+          ))}
         </div>
         <div>
           <h4> Global Scores <i className="fa fa-globe" aria-hidden="true"></i></h4>
-          <p>Low Complexity: {glbLowScr}</p>
-          <p>High Complexity: {glbHighScr}</p>
+          {MODELS.map(model => (
+            <p key={model}>{model}: {glbScores[model]}</p>
+          ))}
         </div>
       </div>
       <div/>

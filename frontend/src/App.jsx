@@ -4,59 +4,62 @@ import Scoreboard from './Scoreboard'
 import QuestionPanel from './QuestionPanel'
 import VotePanel from './VotePanel'
 
+export const MODELS = [
+  "Anthropic Claude Haiku 4.5",
+  "OpenAI GPT-5 mini",
+  "gemini-3-flash-preview",
+]
+
+const zeroScores = () => Object.fromEntries(MODELS.map(m => [m, 0]))
+
 function App() {
-  const [usrLowScr, setUsrLowScr] = useState(0)
-  const [usrHighScr, setUsrHighScr] = useState(0)
-  const [glbLowScr, setGlbLowScr] = useState(0)
-  const [glbHighScr, setGlbHighScr] = useState(0)
+  const [model1, setModel1] = useState(MODELS[0])
+  const [model2, setModel2] = useState(MODELS[1])
+  const [usrScores, setUsrScores] = useState(zeroScores)
+  const [glbScores, setGlbScores] = useState(zeroScores)
   const [scoresChangeable, setScoresChangeable] = useState(false)
 
   useEffect(() => {
     async function fetchGlobal() {
       const response = await fetch("http://localhost:5000/scores")
-      const global_data = await response.json()
-      console.log(global_data)
-      setGlbHighScr(global_data['complex_score'])
-      setGlbLowScr(global_data['simple_score'])
+      const data = await response.json()
+      console.log(data)
+      setGlbScores(prev => ({ ...prev, ...data }))
     }
     fetchGlobal()
     if (!localStorage) return
-    const simpleScore = localStorage.getItem('Simple_Response')
-    const complexScore = localStorage.getItem('Complex_Reponse')
-    if (simpleScore !== null) setUsrHighScr(JSON.parse(simpleScore))
-    if (complexScore !== null) setUsrLowScr(JSON.parse(complexScore))
+    MODELS.forEach(model => {
+      const stored = localStorage.getItem(`score_${model}`)
+      if (stored !== null) {
+        setUsrScores(prev => ({ ...prev, [model]: JSON.parse(stored) }))
+      }
+    })
   }, [])
 
-  const updateServer = async (id) => {
+  const updateServer = async (modelName) => {
     const url = "http://localhost:5000/update_scores"
     const options = {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(id)
+      body: JSON.stringify(modelName)
     }
     const response = await fetch(url, options)
     console.log(response)
   }
 
-  const simpleVictory = async () => {
-    const temp = usrLowScr + 1
-    setUsrLowScr(temp)
-    localStorage.setItem('Simple_Response', JSON.stringify(temp))
-    updateServer("Simple")
-    setScoresChangeable(false)
-  }
-
-  const complexVictory = async () => {
-    const temp = usrHighScr + 1
-    setUsrHighScr(temp)
-    localStorage.setItem('Complex_Response', JSON.stringify(temp))
-    updateServer("Complex")
+  const handleVote = (modelName) => {
+    setUsrScores(prev => {
+      const temp = prev[modelName] + 1
+      localStorage.setItem(`score_${modelName}`, JSON.stringify(temp))
+      return { ...prev, [modelName]: temp }
+    })
+    updateServer(modelName)
     setScoresChangeable(false)
   }
 
   const clearUserScores = () => {
-    setUsrHighScr(0)
-    setUsrLowScr(0)
+    setUsrScores(zeroScores())
+    MODELS.forEach(m => localStorage.removeItem(`score_${m}`))
   }
 
   return (
@@ -66,20 +69,26 @@ function App() {
         <h2>Which AI model gives the best advice?</h2>
         <div id="page-body">
           <div id="main-section">
-            <QuestionPanel onResponsesLoaded={() => setScoresChangeable(true)} />
+            <QuestionPanel
+              model1={model1}
+              model2={model2}
+              onModel1Change={setModel1}
+              onModel2Change={setModel2}
+              onResponsesLoaded={() => setScoresChangeable(true)}
+            />
             <VotePanel
               scoresChangeable={scoresChangeable}
-              onSimpleVote={simpleVictory}
-              onComplexVote={complexVictory}
+              model1={model1}
+              model2={model2}
+              onModel1Vote={() => handleVote(model1)}
+              onModel2Vote={() => handleVote(model2)}
             />
           </div>
         </div>
       </div>
       <Scoreboard
-        usrLowScr={usrLowScr}
-        usrHighScr={usrHighScr}
-        glbLowScr={glbLowScr}
-        glbHighScr={glbHighScr}
+        usrScores={usrScores}
+        glbScores={glbScores}
         onClear={clearUserScores}
       />
     </>
