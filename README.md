@@ -10,10 +10,11 @@ This is a tool for comparing various Large Language Models. Simply ask a questio
 ### Backend
 1. pip install python-dotenv
 2. pip install google-genai
-3. python -m pip install requests
-4. pip install Flask
-5. pip install Flask-SQLAlchemy
-6. pip install flask-cors
+3. pip install openai
+4. pip install requests
+5. pip install Flask
+6. pip install Flask-SQLAlchemy
+7. pip install flask-cors
 
 ## Required API keys
 

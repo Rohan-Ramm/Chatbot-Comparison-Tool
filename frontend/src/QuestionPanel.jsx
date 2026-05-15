@@ -23,8 +23,8 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
     const message = await response.json()
     console.log(message)
     if (response.status == 201) {
-      setResponse1(message["simple_response"])
-      setResponse2(message["complex_response"])
+      setResponse1(message["model1_response"])
+      setResponse2(message["model2_response"])
     } else {
       console.log(message["message"])
     }

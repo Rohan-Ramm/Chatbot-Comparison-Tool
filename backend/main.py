@@ -1,135 +1,126 @@
-#Create, Read, Update, Delete
 from flask import Flask, request, jsonify
 from config import app
 import atexit
 from google import genai
 from google.genai import types
+from openai import OpenAI
 import os
-from dotenv import load_dotenv, dotenv_values
+import json
+from dotenv import load_dotenv
 
+MODELS = [
+    "Anthropic Claude Haiku 4.5",
+    "OpenAI GPT-5 mini",
+    "gemini-3-flash-preview",
+]
 
-# Initialize scores globally
-complex_points = 0.0
-simple_points = 0.0
-client = None
+SYSTEM_INSTRUCTION = (
+    "You are a wise individual. You advise anyone who asks you a question "
+    "in one-two medium length sentences."
+)
+
+scores = {model: 0.0 for model in MODELS}
+gemini_client = None
+github_client = None
 
 
 def load_scores():
-    """Load scores from file on startup"""
-    global complex_points, simple_points
+    global scores
     try:
         with open('data.txt', 'r') as file:
-            content = file.read().strip().split()
-            if len(content) >= 2:
-                complex_points, simple_points = float(content[0]), float(content[1])
-            else:
-                print("Warning: File doesn't contain enough data")
+            data = json.load(file)
+            for model in MODELS:
+                if model in data:
+                    scores[model] = float(data[model])
     except FileNotFoundError:
         print("No existing score file, starting fresh")
     except Exception as e:
         print(f"Error loading scores: {e}")
 
+
 def save_scores():
-    """Save scores to file"""
     try:
         with open('data.txt', 'w') as file:
-            file.write(f"{complex_points} {simple_points}\n")
+            json.dump(scores, file)
     except Exception as e:
         print(f"Error saving scores: {e}")
 
+
 @app.route("/scores", methods=["GET"])
 def get_scores():
-    return jsonify({
-        "complex_score": complex_points,
-        "simple_score": simple_points
-    })
+    return jsonify(scores)
 
 
 @app.route("/get_responses", methods=["POST"])
-def get_responses(): 
-    system_instruction = (
-    "You are a wise individual. You advise anyone who asks you a question "
-    "in one-two medium length sentences."
-    )
-    model="gemini-3-flash-preview"
-    question = request.json.get("usrQuestion")
+def get_responses():
+    data = request.json
+    question = data.get("usrQuestion")
+    model1 = data.get("model1")
+    model2 = data.get("model2")
+
     if not question:
-        return (
-            jsonify({"message": "You must include a question"}),
-            400,
-        )
+        return jsonify({"message": "You must include a question"}), 400
+    if not model1 or not model2:
+        return jsonify({"message": "You must include model1 and model2"}), 400
+
     try:
-        complex_r = ask_model(
-            model=model, 
-            contents=question, 
-            system_instruction=system_instruction 
-        )
-
-        simple_r = ask_model(
-            model=model, 
-            contents=question, 
-            system_instruction=system_instruction,
-            thinking_config=types.ThinkingConfig(
-                thinking_level=types.ThinkingLevel.MINIMAL
-            )
-        )
+        response1 = query_model(model1, question)
+        response2 = query_model(model2, question)
     except Exception as e:
-        return (
-            jsonify({"message": str(e)}),
-            401
-        )
-    return ( jsonify({
-        "simple_response": simple_r,
-        "complex_response": complex_r
-        }), 201
-    )
-    
-    
+        return jsonify({"message": str(e)}), 401
 
-def ask_model(model, contents, system_instruction, thinking_config=None):
-    ai_response = client.models.generate_content(
-        model=model,
-        contents=contents,
+    return jsonify({
+        "model1_response": response1,
+        "model2_response": response2,
+    }), 201
+
+
+def query_model(model_name, question):
+    if model_name == "gemini-3-flash-preview":
+        return ask_gemini(model_name, question)
+    else:
+        return ask_github_model(model_name, question)
+
+
+def ask_gemini(model_name, question):
+    response = gemini_client.models.generate_content(
+        model=model_name,
+        contents=question,
         config=types.GenerateContentConfig(
-            system_instruction=system_instruction,
-            thinking_config=thinking_config
+            system_instruction=SYSTEM_INSTRUCTION
         )
     )
+    return response.text
 
-    return (ai_response.text)
+
+def ask_github_model(model_name, question):
+    response = github_client.chat.completions.create(
+        model=model_name,
+        messages=[
+            {"role": "system", "content": SYSTEM_INSTRUCTION},
+            {"role": "user", "content": question},
+        ]
+    )
+    return response.choices[0].message.content
 
 
-@app.route("/update_scores",methods=["PATCH"])
+@app.route("/update_scores", methods=["PATCH"])
 def update_scores():
-    global complex_points, simple_points
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-    if isinstance(data, str):
-        winner = data
-    elif isinstance(data, dict):
-        winner = data.get('id') or data.get('winner')
-    else:
-        return jsonify({"error": "Invalid data format"}), 400
-    
-    if winner.lower() == "complex":
-        complex_points += 1
-        message = "Complex score incremented"
-    elif winner.lower() == "simple":
-        simple_points += 1
-        message = "Simple score incremented"
-    else:
-        return jsonify({
-            "error": "Winner must be 'Complex' or 'Simple'"
-        }), 400
+    winner = request.get_json()
+    if not winner or not isinstance(winner, str):
+        return jsonify({"error": "Winner model name must be provided as a string"}), 400
+    if winner not in scores:
+        return jsonify({"error": f"Unknown model: {winner}"}), 400
+    scores[winner] += 1
     save_scores()
-    return  jsonify({"message": message}), 200 
+    return jsonify({"message": f"{winner} score incremented"}), 200
+
 
 @app.route("/reset_scores", methods=["POST"])
 def reset_scores():
-    global complex_points, simple_points
-    complex_points = 0.0
-    simple_points = 0.0
+    global scores
+    scores = {model: 0.0 for model in MODELS}
+    save_scores()
     return jsonify({"message": "Scores reset"}), 200
 
 
@@ -139,7 +130,11 @@ if __name__ == "__main__":
     try:
         load_scores()
         load_dotenv()
-        client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+        gemini_client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+        github_client = OpenAI(
+            base_url="https://models.inference.ai.azure.com",
+            api_key=os.getenv("GITHUB_API_KEY"),
+        )
         app.run(debug=True)
     except KeyboardInterrupt:
         save_scores()
