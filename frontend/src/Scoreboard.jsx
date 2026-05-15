@@ -1,4 +1,4 @@
-import { MODELS } from './App'
+import { MODELS } from './constants'
 
 function Scoreboard({ usrScores, glbScores, onClear }) {
   return (

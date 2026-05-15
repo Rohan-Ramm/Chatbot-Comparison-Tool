@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MODELS } from './App'
+import { MODELS } from './constants'
 
 function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onResponsesLoaded }) {
   const [usrQuestion, setUsrQuestion] = useState("")
@@ -8,8 +8,8 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
 
   const askQuestion = async (e) => {
     e.preventDefault()
-    await getResponses()
-    onResponsesLoaded()
+    const ok = await getResponses()
+    if (ok) onResponsesLoaded()
   }
 
   const getResponses = async () => {
@@ -25,9 +25,10 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
     if (response.status == 201) {
       setResponse1(message["model1_response"])
       setResponse2(message["model2_response"])
-    } else {
-      console.log(message["message"])
+      return true
     }
+    console.log(message["message"])
+    return false
   }
 
   return (

@@ -3,12 +3,7 @@ import './App.css'
 import Scoreboard from './Scoreboard'
 import QuestionPanel from './QuestionPanel'
 import VotePanel from './VotePanel'
-
-export const MODELS = [
-  "Anthropic Claude Haiku 4.5",
-  "OpenAI GPT-5 mini",
-  "gemini-3-flash-preview",
-]
+import { MODELS } from './constants'
 
 const zeroScores = () => Object.fromEntries(MODELS.map(m => [m, 0]))
 
@@ -48,11 +43,9 @@ function App() {
   }
 
   const handleVote = (modelName) => {
-    setUsrScores(prev => {
-      const temp = prev[modelName] + 1
-      localStorage.setItem(`score_${modelName}`, JSON.stringify(temp))
-      return { ...prev, [modelName]: temp }
-    })
+    const newScore = usrScores[modelName] + 1
+    setUsrScores(prev => ({ ...prev, [modelName]: prev[modelName] + 1 }))
+    localStorage.setItem(`score_${modelName}`, JSON.stringify(newScore))
     updateServer(modelName)
     setScoresChangeable(false)
   }
