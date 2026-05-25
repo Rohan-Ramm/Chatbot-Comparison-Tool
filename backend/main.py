@@ -9,10 +9,16 @@ import json
 from dotenv import load_dotenv
 
 MODELS = [
-    "Anthropic Claude Haiku 4.5",
-    "OpenAI GPT-5 mini",
-    "gemini-3-flash-preview",
+    "GPT-5 mini",
+    "DeepSeek-R1",
+    "Gemini Flash Preview",
 ]
+
+MODEL_API_IDS = {
+    "GPT-5 mini": "openai/gpt-5-mini",
+    "DeepSeek-R1": "deepseek/DeepSeek-R1",
+    "Gemini Flash Preview": "gemini-3-flash-preview",
+}
 
 SYSTEM_INSTRUCTION = (
     "You are a wise individual. You advise anyone who asks you a question "
@@ -75,11 +81,12 @@ def get_responses():
     }), 201
 
 
-def query_model(model_name, question):
-    if model_name == "gemini-3-flash-preview":
-        return ask_gemini(model_name, question)
+def query_model(display_name, question):
+    api_id = MODEL_API_IDS[display_name]
+    if display_name == "Gemini Flash Preview":
+        return ask_gemini(api_id, question)
     else:
-        return ask_github_model(model_name, question)
+        return ask_github_model(api_id, question)
 
 
 def ask_gemini(model_name, question):
