@@ -15,6 +15,7 @@ This is a tool for comparing various Large Language Models. Simply ask a questio
 5. pip install Flask
 6. pip install Flask-SQLAlchemy
 7. pip install flask-cors
+8. pip install openai
 
 ## Required API keys
 

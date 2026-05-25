@@ -139,7 +139,7 @@ if __name__ == "__main__":
         load_dotenv()
         gemini_client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
         github_client = OpenAI(
-            base_url="https://models.inference.ai.azure.com",
+            base_url="https://models.github.ai/inference",
             api_key=os.getenv("GITHUB_API_KEY"),
         )
         app.run(debug=True)
