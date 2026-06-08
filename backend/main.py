@@ -5,6 +5,7 @@ from google import genai
 from google.genai import types
 from openai import OpenAI
 import os
+import re
 import json
 from dotenv import load_dotenv
 
@@ -84,9 +85,10 @@ def get_responses():
 def query_model(display_name, question):
     api_id = MODEL_API_IDS[display_name]
     if display_name == "Gemini Flash Preview":
-        return ask_gemini(api_id, question)
+        result = ask_gemini(api_id, question)
     else:
-        return ask_github_model(api_id, question)
+        result = ask_github_model(api_id, question)
+    return re.sub(r'<think>.*?</think>', '', result, flags=re.DOTALL).strip()
 
 
 def ask_gemini(model_name, question):
