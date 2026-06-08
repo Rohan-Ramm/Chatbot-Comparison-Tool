@@ -5,6 +5,7 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
   const [usrQuestion, setUsrQuestion] = useState("")
   const [response1, setResponse1] = useState("...")
   const [response2, setResponse2] = useState("...")
+  const [error, setError] = useState(null)
 
   const askQuestion = async (e) => {
     e.preventDefault()
@@ -13,26 +14,39 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
   }
 
   const getResponses = async () => {
-    const url = "http://localhost:5000/get_responses"
-    const options = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usrQuestion, model1, model2 })
+    setError(null)
+    try {
+      const url = "http://localhost:5000/get_responses"
+      const options = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usrQuestion, model1, model2 })
+      }
+      const response = await fetch(url, options)
+      const message = await response.json()
+      if (response.status == 201) {
+        setResponse1(message["model1_response"])
+        setResponse2(message["model2_response"])
+        return true
+      }
+      setError(message["message"] || "An unknown error occurred")
+      return false
+    } catch (e) {
+      setError(e.message || "Failed to reach the server")
+      return false
     }
-    const response = await fetch(url, options)
-    const message = await response.json()
-    console.log(message)
-    if (response.status == 201) {
-      setResponse1(message["model1_response"])
-      setResponse2(message["model2_response"])
-      return true
-    }
-    console.log(message["message"])
-    return false
   }
 
   return (
     <>
+      {error && (
+        <div className="error-backdrop">
+          <div className="error-modal">
+            <p className="error-message">{error}</p>
+            <button className="error-close" onClick={() => setError(null)}>Close</button>
+          </div>
+        </div>
+      )}
       <div className="input-container">
         <form onSubmit={askQuestion}>
           <input
