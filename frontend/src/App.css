@@ -89,3 +89,37 @@
   gap: 1em;
 }
 
+.error-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.error-modal {
+  background: white;
+  border: 3px solid black;
+  padding: 2rem;
+  max-width: 480px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.error-message {
+  font-family: monospace;
+  word-break: break-word;
+  text-align: center;
+  margin: 0;
+}
+
+.error-close {
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+}
+
