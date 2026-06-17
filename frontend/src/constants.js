@@ -1,5 +1,5 @@
 export const MODELS = [
-  "GPT-5 mini",
+  "GPT-4.1",
   "DeepSeek-R1",
   "Gemini Flash Preview",
 ]
