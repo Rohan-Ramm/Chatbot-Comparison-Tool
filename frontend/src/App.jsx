@@ -12,7 +12,7 @@ function App() {
   const [model2, setModel2] = useState(MODELS[1])
   const [usrScores, setUsrScores] = useState(zeroScores)
   const [glbScores, setGlbScores] = useState(zeroScores)
-  const [scoresChangeable, setScoresChangeable] = useState(false)
+  const [scoresChangeable, setScoresChangeable] = useState(true)
 
   useEffect(() => {
     async function fetchGlobal() {

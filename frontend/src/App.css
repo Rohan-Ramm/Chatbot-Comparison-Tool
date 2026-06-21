@@ -1,9 +1,9 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 4rem;
   text-align: center;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: 'Times New Roman', Times, sans-serif;
   display:flex;
   justify-content: center;
 }
@@ -72,7 +72,8 @@
 .after-response {
   display:flex;
   flex-direction: column;
-  align-items: center;
+  text-align: left;
+  align-items: left;
 }
 
 .bullet-point {
@@ -123,3 +124,12 @@
   cursor: pointer;
 }
 
+.question-box {
+  width: 80%;
+}
+
+.responses {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
