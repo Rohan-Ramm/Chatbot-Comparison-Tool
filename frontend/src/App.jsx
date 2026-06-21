@@ -60,7 +60,6 @@ function App() {
       <div id="main-page">
         <h1>A second opinion</h1>
         <h2>Which AI model gives the best advice?</h2>
-        <div id="page-body">
           <div id="main-section">
             <QuestionPanel
               model1={model1}
@@ -76,7 +75,6 @@ function App() {
               onModel1Vote={() => handleVote(model1)}
               onModel2Vote={() => handleVote(model2)}
             />
-          </div>
         </div>
       </div>
       <Scoreboard
