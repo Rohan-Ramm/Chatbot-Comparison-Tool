@@ -57,9 +57,11 @@ function App() {
 
   return (
     <>
+      <div></div>
+      <div></div>
       <div id="main-page">
-        <h1>A second opinion</h1>
-        <h2>Which AI model gives the best advice?</h2>
+        <div><h1>A Second Opinion</h1></div>
+        <div><h2>Which AI model gives the best advice?</h2> </div>
           <div id="main-section">
             <QuestionPanel
               model1={model1}
@@ -77,6 +79,7 @@ function App() {
             />
         </div>
       </div>
+      <div></div>
       <Scoreboard
         usrScores={usrScores}
         glbScores={glbScores}
