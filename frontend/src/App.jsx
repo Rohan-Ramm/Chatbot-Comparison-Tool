@@ -57,29 +57,28 @@ function App() {
 
   return (
     <>
-      <div></div>
-      <div></div>
       <div id="main-page">
-        <div><h1>A Second Opinion</h1></div>
-        <div><h2>Which AI model gives the best advice?</h2> </div>
-          <div id="main-section">
-            <QuestionPanel
-              model1={model1}
-              model2={model2}
-              onModel1Change={setModel1}
-              onModel2Change={setModel2}
-              onResponsesLoaded={() => setScoresChangeable(true)}
-            />
-            <VotePanel
-              scoresChangeable={scoresChangeable}
-              model1={model1}
-              model2={model2}
-              onModel1Vote={() => handleVote(model1)}
-              onModel2Vote={() => handleVote(model2)}
-            />
+        <div>
+          <h1>A Second Opinion</h1>
+          <h2>Which AI model gives the best advice?</h2> 
+        </div>
+        <div id="main-section">
+          <QuestionPanel
+            model1={model1}
+            model2={model2}
+            onModel1Change={setModel1}
+            onModel2Change={setModel2}
+            onResponsesLoaded={() => setScoresChangeable(true)}
+          />
+          <VotePanel
+            scoresChangeable={scoresChangeable}
+            model1={model1}
+            model2={model2}
+            onModel1Vote={() => handleVote(model1)}
+            onModel2Vote={() => handleVote(model2)}
+          />
         </div>
       </div>
-      <div></div>
       <Scoreboard
         usrScores={usrScores}
         glbScores={glbScores}
