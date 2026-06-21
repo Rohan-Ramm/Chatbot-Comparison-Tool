@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { MODELS } from './constants'
 
 function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onResponsesLoaded }) {
-  const [usrQuestion, setUsrQuestion] = useState("")
-  const [response1, setResponse1] = useState("...")
-  const [response2, setResponse2] = useState("...")
+  const [usrQuestion, setUsrQuestion] = useState("What's the best Shakespeare quote?")
+  const [response1, setResponse1] = useState("Tommorow, tommorow, and tommorow. Creeps this petty pace from day to day. To the last syllable of recorded time.")
+  const [response2, setResponse2] = useState("Shall I compare thee to a summer's day. Thou art far fairer and more temperate.")
   const [error, setError] = useState(null)
 
   const askQuestion = async (e) => {
@@ -48,8 +48,9 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
         </div>
       )}
       <div className="input-container">
-        <form onSubmit={askQuestion}>
-          <input
+        <form  onSubmit={askQuestion}>
+          <input 
+            className="question-box"
             value={usrQuestion}
             onChange={(e) => setUsrQuestion(e.target.value)}
             placeholder="Ask a question"
@@ -63,6 +64,7 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
             {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
         </label>
+        <br></br>
         <label>
           Model 2:
           <select value={model2} onChange={(e) => onModel2Change(e.target.value)}>
@@ -70,11 +72,11 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
           </select>
         </label>
       </div>
-      <div>
-        <p>You said: {usrQuestion}</p>
-        <p>{model1} Response: {response1}</p>
-        <p>{model2} Response: {response2}</p>
-      </div>
+      <p className='responses'>
+        <div>You said: {usrQuestion}</div>
+        <div>{model1} Response: {response1}</div>
+        <div>{model2} Response: {response2}</div>
+      </p>
     </>
   )
 }
