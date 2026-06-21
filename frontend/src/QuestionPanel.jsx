@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { MODELS } from './constants'
 
 function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onResponsesLoaded }) {
-  const [usrQuestion, setUsrQuestion] = useState("What's the best Shakespeare quote?")
-  const [response1, setResponse1] = useState("Tommorow, tommorow, and tommorow. Creeps this petty pace from day to day. To the last syllable of recorded time.")
-  const [response2, setResponse2] = useState("Shall I compare thee to a summer's day. Thou art far fairer and more temperate.")
+  const [usrQuestion, setUsrQuestion] = useState("...")
+  const [response1, setResponse1] = useState("...")
+  const [response2, setResponse2] = useState("...")
   const [error, setError] = useState(null)
 
   const askQuestion = async (e) => {
