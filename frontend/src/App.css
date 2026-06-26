@@ -33,7 +33,12 @@
 
 #main-section {
   font-size: 1.05rem;
-  justify-content: flex-start;
+  align-items: start
+}
+
+#main-section > * {
+  border: 1px solid black;
+  padding: 1rem;
 }
 
 #scores {
@@ -77,8 +82,8 @@
 .after-response {
   display:flex;
   flex-direction: column;
-  text-align: left;
-  align-items: left;
+  text-align: start;
+  align-items: center;
 }
 
 .bullet-point {
@@ -131,6 +136,13 @@
 
 .question-box {
   width: 80%;
+  height: 25px;
+  border: 0 ;
+  border-bottom: 3px solid;
+
+  &:focus {
+    border: 3px
+  }
 }
 
 .responses {
@@ -141,5 +153,12 @@
 }
 
 .model-selectors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem
+}
+
+.model-selector {
+  display: flex;
   gap: 0.25rem
 }
