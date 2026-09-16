@@ -8,14 +8,12 @@ This is a tool for comparing various Large Language Models. Simply ask a questio
 ### Frontend
 1. npm install
 ### Backend
-1. pip install python-dotenv
-2. pip install google-genai
-3. pip install openai
-4. pip install requests
-5. pip install Flask
-6. pip install Flask-SQLAlchemy
-7. pip install flask-cors
-8. pip install openai
+1. python-dotenv
+4. requests
+5. Flask
+6. Flask-SQLAlchemy
+7. flask-cors
+8. openrouter
 
 ## Required API keys
 

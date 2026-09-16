@@ -1,9 +1,7 @@
 from flask import Flask, request, jsonify
 from config import app
 import atexit
-from google import genai
-from google.genai import types
-from openai import OpenAI
+from openrouter import OpenRouter
 import os
 import re
 import json
@@ -27,8 +25,7 @@ SYSTEM_INSTRUCTION = (
 )
 
 scores = {model: 0.0 for model in MODELS}
-gemini_client = None
-github_client = None
+open_router_client = None
 
 
 def load_scores():
@@ -84,34 +81,16 @@ def get_responses():
 
 def query_model(display_name, question):
     api_id = MODEL_API_IDS[display_name]
-    if display_name == "Gemini Flash Preview":
-        result = ask_gemini(api_id, question)
-    else:
-        result = ask_github_model(api_id, question)
-    return re.sub(r'<think>.*?</think>', '', result, flags=re.DOTALL).strip()
-
-
-def ask_gemini(model_name, question):
-    response = gemini_client.models.generate_content(
-        model=model_name,
-        contents=question,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_INSTRUCTION
-        )
-    )
-    return response.text
-
-
-def ask_github_model(model_name, question):
-    response = github_client.chat.completions.create(
-        model=model_name,
+    response = open_router_client.chat.send(
+        model=api_id,
         messages=[
-            {"role": "system", "content": SYSTEM_INSTRUCTION},
-            {"role": "user", "content": question},
-        ]
+            {"role": "user", "content": question}
+        ],
     )
-    return response.choices[0].message.content
-
+    result = response.choices[0].message.content
+    if not result: 
+        raise Exception("No result:" + response.choices[0].finish_reason)
+    return re.sub(r'<think>.*?</think>', '', result, flags=re.DOTALL).strip() #Strip thinking section of output
 
 @app.route("/update_scores", methods=["PATCH"])
 def update_scores():
@@ -139,11 +118,7 @@ if __name__ == "__main__":
     try:
         load_scores()
         load_dotenv()
-        gemini_client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
-        github_client = OpenAI(
-            base_url="https://models.github.ai/inference",
-            api_key=os.getenv("GITHUB_API_KEY"),
-        )
+        open_router_client = OpenRouter(api_key=os.getenv("OPEN_ROUTER_API_KEY"))
         app.run(debug=True)
     except KeyboardInterrupt:
         save_scores()
