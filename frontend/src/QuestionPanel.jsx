@@ -3,12 +3,16 @@ import { MODELS } from './constants'
 
 function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onResponsesLoaded }) {
   const [usrQuestion, setUsrQuestion] = useState("")
+  const [qDisplay, setQDisplay] = useState("...")
   const [response1, setResponse1] = useState("...")
   const [response2, setResponse2] = useState("...")
   const [error, setError] = useState(null)
 
   const askQuestion = async (e) => {
     e.preventDefault()
+    setQDisplay(usrQuestion)
+    setResponse1("Loading...")
+    setResponse2("Loading...")
     const ok = await getResponses()
     if (ok) onResponsesLoaded()
   }
@@ -73,7 +77,7 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
         </label>
       </div>
       <div className='responses'>
-        <div>You said: {usrQuestion}</div>
+        <div>You said: {qDisplay}</div>
         <div>{model1} Response: {response1}</div>
         <div>{model2} Response: {response2}</div>
       </div>
