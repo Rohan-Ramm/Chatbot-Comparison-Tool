@@ -24,6 +24,7 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
       }
       const response = await fetch(url, options)
       const message = await response.json()
+      console.log(message)
       if (response.status == 201) {
         setResponse1(message["model1_response"])
         setResponse2(message["model2_response"])
@@ -71,11 +72,11 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
           </select>
         </label>
       </div>
-      <p className='responses'>
+      <div className='responses'>
         <div>You said: {usrQuestion}</div>
         <div>{model1} Response: {response1}</div>
         <div>{model2} Response: {response2}</div>
-      </p>
+      </div>
     </>
   )
 }
