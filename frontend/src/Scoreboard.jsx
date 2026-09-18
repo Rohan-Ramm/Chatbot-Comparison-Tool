@@ -1,24 +1,20 @@
+import { useState } from 'react'
 import { MODELS } from './constants'
+import Searchbar from './Searchbar'
 
 function Scoreboard({ usrScores, glbScores, onClear }) {
+  const [model,setModel] = useState("GPT-5")
+
   return (
     <div id="scores">
       <div className='border'>
-        <div>
-          <div id="title">
-            <h4> User Scores <i className="fa fa-user" aria-hidden="true"></i></h4>
-            <button id="clear" onClick={onClear}>Clear</button>
-          </div>
-          {MODELS.map(model => (
-            <p key={model}>{model}: {usrScores[model]}</p>
-          ))}
-        </div>
-        <div>
-          <h4> Global Scores <i className="fa fa-globe" aria-hidden="true"></i></h4>
-          {MODELS.map(model => (
-            <p key={model}>{model}: {glbScores[model]}</p>
-          ))}
-        </div>
+        <h2>Scoreboard</h2>
+        <b>{model}</b>
+        <div>Local score: wins,  w.r.</div>
+        <div>Global score: wins,  w.r.</div>
+        <Searchbar/>
+        <Searchbar/>
+        <button id="clear" onClick={onClear}>Clear scores</button>
       </div>
       <div/>
     </div>

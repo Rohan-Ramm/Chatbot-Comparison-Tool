@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MODELS } from './constants'
+import Searchbar from './Searchbar'
 
 function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onResponsesLoaded }) {
   const [usrQuestion, setUsrQuestion] = useState("")
@@ -64,22 +65,20 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
       </div>
       <div className="model-selectors">
         <label className ="model-selector">
-          Model 1
-          <select value={model1} onChange={(e) => onModel1Change(e.target.value)}>
-            {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
+          The Counselor
+          <Searchbar/>
+          <Searchbar/>
         </label>
         <label className ="model-selector">
-          Model 2
-          <select value={model2} onChange={(e) => onModel2Change(e.target.value)}>
-            {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
+          The consultant
+          <Searchbar/>
+          <Searchbar/>
         </label>
       </div>
       <div className='responses'>
-        <div>You said: {qDisplay}</div>
-        <div>{model1} Response: {response1}</div>
-        <div>{model2} Response: {response2}</div>
+        <div>You asked: {qDisplay}</div>
+        <div>The Counselor: {response1}</div>
+        <div>The Consultant: {response2}</div>
       </div>
     </>
   )

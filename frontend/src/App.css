@@ -154,11 +154,12 @@
 
 .model-selectors {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.25rem
 }
 
 .model-selector {
   display: flex;
-  gap: 0.25rem
+  flex-direction: column;
+  border: 2px solid black;
 }

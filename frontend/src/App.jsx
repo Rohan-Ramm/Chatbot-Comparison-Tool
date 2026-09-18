@@ -60,7 +60,7 @@ function App() {
       <div id="main-page">
         <div>
           <h1>A Second Opinion</h1>
-          <h2>Which AI model gives the best advice?</h2> 
+          <h2>Who gives the best advice?</h2> 
         </div>
         <div id="main-section">
           <QuestionPanel
