@@ -12,8 +12,7 @@ function Scoreboard({ usrScores, glbScores, onClear }) {
         <b>{model}</b>
         <div>Local score: wins,  w.r.</div>
         <div>Global score: wins,  w.r.</div>
-        <Searchbar/>
-        <Searchbar/>
+        <Searchbar name={"Model"} options={["Aptitude","Altitude",'Alchemist',"Alting","Brave"]}/>
         <button id="clear" onClick={onClear}>Clear scores</button>
       </div>
       <div/>
