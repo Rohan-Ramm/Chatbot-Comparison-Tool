@@ -19,10 +19,16 @@ MODEL_API_IDS = {
     "Gemini Flash Preview": "gemini-3-flash-preview",
 }
 
-SYSTEM_INSTRUCTION = (
-    "You are a wise individual. You advise anyone who asks you a question "
-    "in one-two medium length sentences."
-)
+SYSTEM_INSTRUCTION = {
+    "None": "",
+    "Caveman": "You caveman. No use many word when few word do trick",
+    "Sage": "Your greatest enemy is the desires of the flesh. Your second greatest is over-explaining.",
+    "Scholar": "You are well-read on every subject and remember everything you've everything read."
+               "Furthermore, you have an extensive vocabulary and no inhibitions about using it.",
+    "Youth": "You are a smart young one. Your advice is insightful but bolder and more inventive than" 
+             "that of your elder's. You spend enough time online to be familiar with all the newest slang and" 
+             "brainrot, but spend enough time offline to know when to use it."
+}
 
 scores = {model: 0.0 for model in MODELS}
 open_router_client = None
@@ -60,7 +66,9 @@ def get_responses():
     data = request.json
     question = data.get("usrQuestion")
     model1 = data.get("model1")
+    instructions1 = data.get("instructions1")
     model2 = data.get("model2")
+    instructions2 = data.get("instructions2")
 
     if not question:
         return jsonify({"message": "You must include a question"}), 400
@@ -68,8 +76,8 @@ def get_responses():
         return jsonify({"message": "You must include model1 and model2"}), 400
 
     try:
-        response1 = query_model(model1, question)
-        response2 = query_model(model2, question)
+        response1 = query_model(model1, question,instructions1)
+        response2 = query_model(model2, question,instructions2)
     except Exception as e:
         return jsonify({"message": str(e)}), 401
 
@@ -79,16 +87,19 @@ def get_responses():
     }), 201
 
 
-def query_model(display_name, question):
-    api_id = MODEL_API_IDS[display_name]
+def query_model(display_name, question,instructions):
+    model = MODEL_API_IDS[display_name]
+    system_prompt = SYSTEM_INSTRUCTION[instructions]
     response = open_router_client.chat.send(
-        model=api_id,
+        model=model,
         messages=[
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": question}
         ],
     )
     result = response.choices[0].message.content
     if not result: 
+        print(response.choices[0])
         raise Exception("No result:" + response.choices[0].finish_reason)
     return re.sub(r'<think>.*?</think>', '', result, flags=re.DOTALL).strip() #Strip thinking section of output
 

@@ -3,3 +3,11 @@ export const MODELS = [
   "DeepSeek-R1",
   "Gemini Flash Preview",
 ]
+
+export const CHARACTERS = [
+  "None",
+  "Sage",
+  "Scholar",
+  "Youth",
+  "Caveman"
+]

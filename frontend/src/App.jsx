@@ -3,13 +3,18 @@ import './App.css'
 import Scoreboard from './Scoreboard'
 import QuestionPanel from './QuestionPanel'
 import VotePanel from './VotePanel'
-import { MODELS } from './constants'
+import { MODELS,CHARACTERS } from './constants'
 
-const zeroScores = () => Object.fromEntries(MODELS.map(m => [m, 0]))
+const zeroScores = () => ({
+  models: Object.fromEntries(MODELS.map(m => [m, 0,0])),
+  characters: Object.fromEntries(CHARACTERS.map(c => [c, 0, 0]))
+});
 
 function App() {
   const [model1, setModel1] = useState(MODELS[0])
   const [model2, setModel2] = useState(MODELS[1])
+  const [character1,setCharacter1] = useState(CHARACTERS[0])
+  const [character2,setCharacter2] = useState(CHARACTERS[1])
   const [usrScores, setUsrScores] = useState(zeroScores)
   const [glbScores, setGlbScores] = useState(zeroScores)
   const [scoresChangeable, setScoresChangeable] = useState(true)
@@ -23,12 +28,27 @@ function App() {
     }
     fetchGlobal()
     if (!localStorage) return
-    MODELS.forEach(model => {
-      const stored = localStorage.getItem(`score_${model}`)
-      if (stored !== null) {
-        setUsrScores(prev => ({ ...prev, [model]: JSON.parse(stored) }))
-      }
-    })
+    setUsrScores(() => {
+      const scores = {
+        models: { ...prev.models },
+        characters: { ...prev.characters }
+    };
+      MODELS.forEach(model => {
+          const stored = localStorage.getItem(`score_${model}`);
+
+          if (stored !== null) {
+              scores.models[model] = JSON.parse(stored);
+          }
+      });
+      CHARACTERS.forEach(character => {
+          const stored = localStorage.getItem(`score_${character}`);
+
+          if (stored !== null) {
+              scores.characters[character] = JSON.parse(stored);
+          }
+      });
+      return scores;
+    })  
   }, [])
 
   const updateServer = async (modelName) => {
@@ -42,10 +62,14 @@ function App() {
     console.log(response)
   }
 
-  const handleVote = (modelName) => {
-    const newScore = usrScores[modelName] + 1
+  const handleVote = (modelName, characterName) => {
+    const newModelScore = usrScores.models[modelName] + 1
+    const newCharacterScore = usrScores.characters[characterName] + 1
     setUsrScores(prev => ({ ...prev, [modelName]: prev[modelName] + 1 }))
-    localStorage.setItem(`score_${modelName}`, JSON.stringify(newScore))
+    setUsrScores(prev => ({ ...prev, models: {...models, [modelName]: newModelScore}}))
+    setUsrScores(prev => ({ ...prev, characters: {...characters, [characterName]: newCharacterScore}}))
+    localStorage.setItem(`score_${modelName}`, JSON.stringify(newModelScore))
+    localStorage.setItem(`score_${modelName}`, JSON.stringify(newCharacterScore))
     updateServer(modelName)
     setScoresChangeable(false)
   }
@@ -72,10 +96,8 @@ function App() {
           />
           <VotePanel
             scoresChangeable={scoresChangeable}
-            model1={model1}
-            model2={model2}
-            onModel1Vote={() => handleVote(model1)}
-            onModel2Vote={() => handleVote(model2)}
+            onModel1Vote={() => handleVote(model1,character1,model2,character2)}
+            onModel2Vote={() => handleVote(model2,character2,model1,character1)}
           />
         </div>
       </div>
