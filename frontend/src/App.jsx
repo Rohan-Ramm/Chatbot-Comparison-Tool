@@ -24,15 +24,16 @@ function App() {
       const response = await fetch("http://localhost:5000/scores")
       const data = await response.json()
       console.log(data)
-      setGlbScores(prev => ({ ...prev, ...data }))
+      setGlbScores(prev => ({ ...prev, models: {...prev.models, data}}))
     }
     fetchGlobal()
     if (!localStorage) return
-    setUsrScores(() => {
+    setUsrScores(prev => {
       const scores = {
-        models: { ...prev.models },
-        characters: { ...prev.characters }
-    };
+          models: { ...prev.models },
+          characters: { ...prev.characters }
+      };
+
       MODELS.forEach(model => {
           const stored = localStorage.getItem(`score_${model}`);
 
@@ -40,6 +41,7 @@ function App() {
               scores.models[model] = JSON.parse(stored);
           }
       });
+
       CHARACTERS.forEach(character => {
           const stored = localStorage.getItem(`score_${character}`);
 
@@ -47,8 +49,9 @@ function App() {
               scores.characters[character] = JSON.parse(stored);
           }
       });
+
       return scores;
-    })  
+    });
   }, [])
 
   const updateServer = async (modelName) => {
