@@ -6,8 +6,8 @@ import VotePanel from './VotePanel'
 import { MODELS,CHARACTERS } from './constants'
 
 const zeroScores = () => ({
-  models: Object.fromEntries(MODELS.map(m => [m, 0,0])),
-  characters: Object.fromEntries(CHARACTERS.map(c => [c, 0, 0]))
+  models: Object.fromEntries(MODELS.map(m => [m, [0,0]])),
+  characters: Object.fromEntries(CHARACTERS.map(c => [c, [0, 0]]))
 });
 
 function App() {
@@ -52,6 +52,8 @@ function App() {
 
       return scores;
     });
+    console.log("Hi")
+    console.log(usrScores)
   }, [])
 
   const updateServer = async (modelName) => {
@@ -80,6 +82,7 @@ function App() {
   const clearUserScores = () => {
     setUsrScores(zeroScores())
     MODELS.forEach(m => localStorage.removeItem(`score_${m}`))
+    CHARACTERS.forEach(m => localStorage.removeItem(`score_${m}`))
   }
 
   return (
@@ -95,6 +98,12 @@ function App() {
             model2={model2}
             onModel1Change={setModel1}
             onModel2Change={setModel2}
+            character1={character1}
+            character2={character2}
+            onChar1Change={setCharacter1}
+            onChar2Change={setCharacter2}
+            models={MODELS}
+            characters={CHARACTERS}
             onResponsesLoaded={() => setScoresChangeable(true)}
           />
           <VotePanel
@@ -107,6 +116,8 @@ function App() {
       <Scoreboard
         usrScores={usrScores}
         glbScores={glbScores}
+        models={MODELS}
+        characters={CHARACTERS}
         onClear={clearUserScores}
       />
     </>

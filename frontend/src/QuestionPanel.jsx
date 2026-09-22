@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { MODELS } from './constants'
 import Searchbar from './Searchbar'
 
-function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onResponsesLoaded }) {
+function QuestionPanel({ model1, model2, onModel1Change, onModel2Change,
+character1,character2,onChar1Change,onChar2Change, onResponsesLoaded, models,characters}) {
   const [usrQuestion, setUsrQuestion] = useState("")
   const [qDisplay, setQDisplay] = useState("...")
   const [response1, setResponse1] = useState("...")
@@ -65,14 +65,18 @@ function QuestionPanel({ model1, model2, onModel1Change, onModel2Change, onRespo
       </div>
       <div className="model-selectors">
         <label className ="model-selector">
-          The Counselor
-          <Searchbar/>
-          <Searchbar/>
+          <b>The Counselor</b>
+          <i>{model1}</i>
+          <Searchbar options={models} onSubmit={onModel1Change}/>
+          <i>{character1}</i>
+          <Searchbar options={characters} onSubmit={onChar1Change}/>
         </label>
         <label className ="model-selector">
-          The consultant
-          <Searchbar/>
-          <Searchbar/>
+          <b>The Consultant</b>
+          <i>{model2}</i>
+          <Searchbar options={models} onSubmit={onModel2Change}/>
+          <i>{character2}</i>
+          <Searchbar options={characters} onSubmit={onChar2Change}/>
         </label>
       </div>
       <div className='responses'>
