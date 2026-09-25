@@ -6,7 +6,8 @@ This is a tool for comparing various Large Language Models. Simply ask a questio
   - Gemini Flash Preview
 ## Dependencies
 ### Frontend
-1. npm install
+1. npm
+2. react-markdown
 ### Backend
 1. python-dotenv
 4. requests

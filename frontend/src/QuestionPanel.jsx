@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import Searchbar from './Searchbar'
+import ReactMarkdown from "react-markdown";
 
 function QuestionPanel({ model1, model2, onModel1Change, onModel2Change,
-character1,character2,onChar1Change,onChar2Change, onResponsesLoaded, models,characters}) {
+character1,character2,onChar1Change,onChar2Change, 
+onResponsesLoaded, models,characters, scoresChangeable}) {
   const [usrQuestion, setUsrQuestion] = useState("")
   const [qDisplay, setQDisplay] = useState("...")
-  const [response1, setResponse1] = useState("...")
-  const [response2, setResponse2] = useState("...")
+  const [response1, setResponse1] = useState("N/A")
+  const [response2, setResponse2] = useState("N/A")
   const [error, setError] = useState(null)
 
   const askQuestion = async (e) => {
@@ -25,7 +27,7 @@ character1,character2,onChar1Change,onChar2Change, onResponsesLoaded, models,cha
       const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usrQuestion, model1, model2 })
+        body: JSON.stringify({ usrQuestion, model1, model2, character1, character2 })
       }
       const response = await fetch(url, options)
       const message = await response.json()
@@ -67,22 +69,28 @@ character1,character2,onChar1Change,onChar2Change, onResponsesLoaded, models,cha
         <label className ="model-selector">
           <b>The Counselor</b>
           <i>{model1}</i>
-          <Searchbar options={models} onSubmit={onModel1Change}/>
+          {!scoresChangeable && <Searchbar options={models} onSubmit={onModel1Change}/>}
           <i>{character1}</i>
-          <Searchbar options={characters} onSubmit={onChar1Change}/>
+          {!scoresChangeable && <Searchbar options={characters} onSubmit={onChar1Change}/>}
         </label>
         <label className ="model-selector">
           <b>The Consultant</b>
           <i>{model2}</i>
-          <Searchbar options={models} onSubmit={onModel2Change}/>
+          {!scoresChangeable && <Searchbar options={models} onSubmit={onModel2Change}/>}
           <i>{character2}</i>
-          <Searchbar options={characters} onSubmit={onChar2Change}/>
+          {!scoresChangeable && <Searchbar options={characters} onSubmit={onChar2Change}/>}
         </label>
       </div>
       <div className='responses'>
-        <div>You asked: {qDisplay}</div>
-        <div>The Counselor: {response1}</div>
-        <div>The Consultant: {response2}</div>
+        <div><b>You asked:</b> {qDisplay}</div>
+        <div>
+          <b>The Counselor: </b> 
+          <ReactMarkdown>{response1}</ReactMarkdown>
+        </div>
+        <div>
+          <b>The Consultant: </b> 
+          <ReactMarkdown>{response2}</ReactMarkdown>
+        </div>
       </div>
     </>
   )

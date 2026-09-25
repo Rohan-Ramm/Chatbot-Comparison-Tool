@@ -24,7 +24,7 @@ function App() {
       const response = await fetch("http://localhost:5000/scores")
       const data = await response.json()
       console.log(data)
-      setGlbScores(prev => ({ ...prev, models: {...prev.models, data}}))
+      setGlbScores(prev => ({models: data.models, characters: data.characters }))
     }
     fetchGlobal()
     if (!localStorage) return
@@ -56,33 +56,42 @@ function App() {
     console.log(usrScores)
   }, [])
 
-  const updateServer = async (modelName) => {
+  const updateServer = async (winnerModel, winnerCharacter, loserModel, loserCharacter) => {
+    const data = {"winner_model": winnerModel, "winner_character": winnerCharacter, "loser_model": loserModel, "loser_character": loserCharacter}
+
     const url = "http://localhost:5000/update_scores"
     const options = {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(modelName)
+      body: JSON.stringify(data)
     }
     const response = await fetch(url, options)
     console.log(response)
   }
 
-  const handleVote = (modelName, characterName) => {
-    const newModelScore = usrScores.models[modelName] + 1
-    const newCharacterScore = usrScores.characters[characterName] + 1
-    setUsrScores(prev => ({ ...prev, [modelName]: prev[modelName] + 1 }))
-    setUsrScores(prev => ({ ...prev, models: {...models, [modelName]: newModelScore}}))
-    setUsrScores(prev => ({ ...prev, characters: {...characters, [characterName]: newCharacterScore}}))
-    localStorage.setItem(`score_${modelName}`, JSON.stringify(newModelScore))
-    localStorage.setItem(`score_${modelName}`, JSON.stringify(newCharacterScore))
-    updateServer(modelName)
+  const handleVote = (winnerModel, winnerCharacter, loserModel, loserCharacter) => {
+    const newWMScore = [usrScores.models[winnerModel][0] + 1, usrScores.models[winnerModel][1] + 1]
+    const newWCScore = [usrScores.characters[winnerCharacter][0] + 1, usrScores.characters[winnerCharacter][1] + 1]
+    const newLMScore = [usrScores.models[loserModel][0], usrScores.models[loserModel][1] + 1]
+    const newLCScore = [usrScores.characters[loserCharacter][0], usrScores.characters[loserCharacter][1] + 1]
+
+    setUsrScores(prev => ({ ...prev, models: {...prev.models, [winnerModel]: newWMScore}}))
+    setUsrScores(prev => ({ ...prev, characters: {...prev.characters, [winnerCharacter]: newWCScore}}))
+    setUsrScores(prev => ({ ...prev, models: {...prev.models, [loserModel]: newLMScore}}))
+    setUsrScores(prev => ({ ...prev, characters: {...prev.characters, [loserCharacter]: newLCScore}}))
+
+    localStorage.setItem(`score_${winnerModel}`, JSON.stringify(newWMScore))
+    localStorage.setItem(`score_${winnerCharacter}`, JSON.stringify(newWCScore))
+    localStorage.setItem(`score_${loserModel}`, JSON.stringify(newLMScore))
+    localStorage.setItem(`score_${loserCharacter}`, JSON.stringify(newLCScore))
+
+    updateServer(winnerModel, winnerCharacter, loserModel, loserCharacter)
     setScoresChangeable(false)
   }
 
   const clearUserScores = () => {
     setUsrScores(zeroScores())
-    MODELS.forEach(m => localStorage.removeItem(`score_${m}`))
-    CHARACTERS.forEach(m => localStorage.removeItem(`score_${m}`))
+    localStorage.clear()
   }
 
   return (
@@ -105,11 +114,12 @@ function App() {
             models={MODELS}
             characters={CHARACTERS}
             onResponsesLoaded={() => setScoresChangeable(true)}
+            scoresChangeable={scoresChangeable}
           />
           <VotePanel
             scoresChangeable={scoresChangeable}
-            onModel1Vote={() => handleVote(model1,character1,model2,character2)}
-            onModel2Vote={() => handleVote(model2,character2,model1,character1)}
+            onCounselorVote={() => handleVote(model1,character1,model2,character2)}
+            onConsultantVote={() => handleVote(model2,character2,model1,character1)}
           />
         </div>
       </div>
