@@ -112,7 +112,7 @@ def query_model(display_name, question,instructions):
     if not result: 
         print(f"{display_name} {instructions}")
         print(response)
-        raise Exception("No result:" + response.choices[0].finish_reason)
+        return "No Result"
     return re.sub(r'<think>.*?</think>', '', result, flags=re.DOTALL).strip() #Strip thinking section of output
 
 @app.route("/update_scores", methods=["PATCH"])

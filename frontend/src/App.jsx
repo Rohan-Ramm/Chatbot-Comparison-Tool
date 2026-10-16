@@ -6,13 +6,15 @@ import VotePanel from './VotePanel'
 import { MODELS,CHARACTERS } from './constants'
 
 const zeroScores = () => ({
-  models: Object.fromEntries(MODELS.map(m => [m, [0,0]])),
+  //models: Object.fromEntries(MODELS.map(m => [m, [0,0]])),
+  models: {},
   characters: Object.fromEntries(CHARACTERS.map(c => [c, [0, 0]]))
 });
 
 function App() {
-  const [model1, setModel1] = useState(MODELS[0])
-  const [model2, setModel2] = useState(MODELS[1])
+  const [modelNames,setModelNames] = useState([])
+  const [model1, setModel1] = useState("")
+  const [model2, setModel2] = useState("")
   const [character1,setCharacter1] = useState(CHARACTERS[0])
   const [character2,setCharacter2] = useState(CHARACTERS[1])
   const [usrScores, setUsrScores] = useState(zeroScores)
@@ -20,12 +22,19 @@ function App() {
   const [scoresChangeable, setScoresChangeable] = useState(true)
 
   useEffect(() => {
+    async function fetchModelNames() {
+      const response = await fetch("http://localhost:5000/model_names")
+      const data = await response.json()
+      console.log(data)
+      setModelNames(data)
+    }
     async function fetchGlobal() {
       const response = await fetch("http://localhost:5000/scores")
       const data = await response.json()
       console.log(data)
       setGlbScores(prev => ({models: data.models, characters: data.characters }))
     }
+    fetchModelNames()
     fetchGlobal()
     if (!localStorage) return
     setUsrScores(prev => {
@@ -34,11 +43,13 @@ function App() {
           characters: { ...prev.characters }
       };
 
-      MODELS.forEach(model => {
+      modelNames.forEach(model => {
           const stored = localStorage.getItem(`score_${model}`);
 
           if (stored !== null) {
               scores.models[model] = JSON.parse(stored);
+          } else {
+            scores.models[model] = [0,0];
           }
       });
 
@@ -47,6 +58,8 @@ function App() {
 
           if (stored !== null) {
               scores.characters[character] = JSON.parse(stored);
+          } else {
+            scores.characters[character] = [0,0];
           }
       });
 
