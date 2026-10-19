@@ -7,13 +7,7 @@ import re
 import json
 from dotenv import load_dotenv
 
-MODELS = [
-    "GPT-4.1",
-    "DeepSeek-R1",
-    "Gemini Flash Preview",
-]
-
-CHARACTERS = [
+CHARACTER_LIST = [
     "None",
     "Caveman",
     "Sage",
@@ -21,11 +15,7 @@ CHARACTERS = [
     "Youth"
 ]
 
-MODEL_API_IDS = {
-    "GPT-4.1": "openai/gpt-4.1",
-    "DeepSeek-R1": "deepseek/DeepSeek-R1",
-    "Gemini Flash Preview": "gemini-3-flash-preview",
-}
+MODEL_LIST = []
 
 SYSTEM_INSTRUCTION = {
     "None": "",
@@ -49,10 +39,11 @@ def load_scores():
             scores = json.load(file)
     except FileNotFoundError:
         print("No existing score file, starting fresh")
-        scores = {"models": {model: [0,0] for model in MODELS},
-          "characters": {character: [0,0] for character in CHARACTERS}}
+        scores = {"models": {}, "characters": {character: [0,0] for character in CHARACTER_LIST}}
     except Exception as e:
         print(f"Error loading scores: {e}")
+    finally:
+        refresh_model_information()
 
 
 def save_scores():
@@ -97,11 +88,10 @@ def get_responses():
     }), 201
 
 
-def query_model(display_name, question,instructions):
-    model = MODEL_API_IDS[display_name]
+def query_model(model_name, question,instructions):
     system_prompt = SYSTEM_INSTRUCTION[instructions]
     response = open_router_client.chat.send(
-        model=model,
+        model=model_name,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "system", "content": "Always give an answer, never return without saying anything."},
@@ -110,7 +100,7 @@ def query_model(display_name, question,instructions):
     )
     result = response.choices[0].message.content
     if not result: 
-        print(f"{display_name} {instructions}")
+        print(f"{model_name} {instructions}")
         print(response)
         return "No Result"
     return re.sub(r'<think>.*?</think>', '', result, flags=re.DOTALL).strip() #Strip thinking section of output
@@ -134,24 +124,40 @@ def update_scores_helper(name,winner,type):
     if name not in scores[type]:
         return LookupError("Name not found")
     scores[type][name][1] += 1
-    scores[type][name][0] += winner #wins only incremented if player wins
+    scores[type][name][0] += winner #wins only incremented if winning player
     
     
 
 @app.route("/reset_scores", methods=["POST"])
 def reset_scores():
     global scores
-    scores = {"models": {model: [0,0] for model in MODELS},
-          "characters": {character: [0,0] for character in CHARACTERS}}
+    scores = {"models": {},
+          "characters": {character: [0,0] for character in CHARACTER_LIST}}
     save_scores()
     return jsonify({"message": "Scores reset"}), 200
 
+@app.route("/model_names",methods=["GET"])
+def get_models():
+    return jsonify(MODEL_LIST)
+    
+def refresh_model_information():
+    global MODEL_LIST
+    res = open_router_client.models.list(
+        sort="top-weekly",
+        input_modalities="text",
+        output_modalities="text",
+    )
+    for model in res.result.data:
+        if model.id not in scores["models"]:
+            scores["models"][model.id] = [0,0]
+            
+    MODEL_LIST = [tuple[0] for tuple in sorted(scores["models"].items(), key=lambda x: x[1][1],reverse=True)]
 
 if __name__ == "__main__":
     try:
-        load_scores()
         load_dotenv()
         open_router_client = OpenRouter(api_key=os.getenv("OPEN_ROUTER_API_KEY"))
+        load_scores()
         app.run(debug=True)
     except KeyboardInterrupt:
         save_scores()

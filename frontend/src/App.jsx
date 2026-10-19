@@ -3,11 +3,10 @@ import './App.css'
 import Scoreboard from './Scoreboard'
 import QuestionPanel from './QuestionPanel'
 import VotePanel from './VotePanel'
-import { MODELS,CHARACTERS } from './constants'
+import { CHARACTERS } from './constants'
 
 const zeroScores = () => ({
-  //models: Object.fromEntries(MODELS.map(m => [m, [0,0]])),
-  models: {},
+  models: {"GPT-4.1": [0,0]}, //placeholder, so that nothing is undefined before the useEffect hook runs
   characters: Object.fromEntries(CHARACTERS.map(c => [c, [0, 0]]))
 });
 
@@ -34,8 +33,8 @@ function App() {
       console.log(data)
       setGlbScores(prev => ({models: data.models, characters: data.characters }))
     }
-    fetchModelNames()
     fetchGlobal()
+    fetchModelNames()
     if (!localStorage) return
     setUsrScores(prev => {
       const scores = {
@@ -124,7 +123,7 @@ function App() {
             character2={character2}
             onChar1Change={setCharacter1}
             onChar2Change={setCharacter2}
-            models={MODELS}
+            models={modelNames}
             characters={CHARACTERS}
             onResponsesLoaded={() => setScoresChangeable(true)}
             scoresChangeable={scoresChangeable}
@@ -139,7 +138,7 @@ function App() {
       <Scoreboard
         usrScores={usrScores}
         glbScores={glbScores}
-        models={MODELS}
+        models={modelNames}
         characters={CHARACTERS}
         onClear={clearUserScores}
       />
